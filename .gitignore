@@ -1,0 +1,9 @@
+# Ignore sensitive configuration files
+backend/src/main/resources/application.properties
+
+# Ignore dependencies
+node_modules/
+
+# Ignore build and cache files
+.cache/
+dist/

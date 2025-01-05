@@ -1,0 +1,25 @@
+type User {
+  email: String!
+  name: String!
+  role: String!
+  tasks: [Task] @relationship(type: "ASSIGNED_TO", direction: OUT)
+  skills: [Skill] @relationship(type: "HAS_SKILL", direction: OUT)
+}
+
+type Task {
+  id: String!
+  name: String!
+  epic: Epic @relationship(type: "PART_OF", direction: OUT)
+  dependencies: [Task] @relationship(type: "DEPENDS_ON", direction: OUT)
+}
+
+type Epic {
+  id: String!
+  title: String!
+  tasks: [Task] @relationship(type: "PART_OF", direction: IN)
+}
+
+type Skill {
+  name: String!
+  users: [User] @relationship(type: "HAS_SKILL", direction: IN)
+}
