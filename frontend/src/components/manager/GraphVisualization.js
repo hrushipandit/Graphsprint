@@ -1,8 +1,10 @@
-// src/components/GraphVisualization.js
+// src/components/manager/GraphVisualization.js
 
 import React, { useEffect, useState } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import './GraphVisualization.css'; // Import CSS for styling
 
 const backendUrl = "http://localhost:8080";
 
@@ -15,26 +17,28 @@ const apiClient = axios.create({
   },
 });
 
-const GraphVisualization = ({ backendUrl }) => {
+const GraphVisualization = () => {
   const [elements, setElements] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchGraphData = async () => {
       try {
         const [usersRes, tasksRes, epicsRes, skillsRes, relationshipsRes] =
           await Promise.all([
-            apiClient.get(`${backendUrl}/graph/users`),
-            apiClient.get(`${backendUrl}/graph/tasks`),
-            apiClient.get(`${backendUrl}/graph/epics`),
-            apiClient.get(`${backendUrl}/graph/skills`),
-            apiClient.get(`${backendUrl}/graph/relationships`),
+            apiClient.get(`/graph/users`),
+            apiClient.get(`/graph/tasks`),
+            apiClient.get(`/graph/epics`),
+            apiClient.get(`/graph/skills`),
+            apiClient.get(`/graph/relationships`),
           ]);
 
-        const users = usersRes.data.filter(email => email && email !== 'null'); // Filter out null/undefined/'null' emails
-        const tasks = tasksRes.data.filter(id => id && id !== 'null'); // Filter out null/undefined/'null' task IDs
-        const epics = epicsRes.data.filter(id => id && id !== 'null'); // Filter out null/undefined/'null' epic IDs
-        const skills = skillsRes.data.filter(name => name && name !== 'null'); // Filter out null/undefined/'null' skill names
-        const relationships = relationshipsRes.data.filter(
+        // Validate and filter data
+        const users = Array.isArray(usersRes.data) ? usersRes.data.filter(email => email && email !== 'null') : [];
+        const tasks = Array.isArray(tasksRes.data) ? tasksRes.data.filter(id => id && id !== 'null') : [];
+        const epics = Array.isArray(epicsRes.data) ? epicsRes.data.filter(id => id && id !== 'null') : [];
+        const skills = Array.isArray(skillsRes.data) ? skillsRes.data.filter(name => name && name !== 'null') : [];
+        const relationships = Array.isArray(relationshipsRes.data) ? relationshipsRes.data.filter(
           rel =>
             rel.fromId &&
             rel.toId &&
@@ -46,7 +50,7 @@ const GraphVisualization = ({ backendUrl }) => {
             rel.fromLabel !== 'null' &&
             rel.toLabel !== 'null' &&
             rel.relationship !== 'null'
-        ); // Filter out invalid relationships
+        ) : [];
 
         // Create nodes
         const nodes = [
@@ -94,16 +98,17 @@ const GraphVisualization = ({ backendUrl }) => {
           }));
 
         setElements([...nodes, ...edges]);
+        console.log("Graph Elements:", [...nodes, ...edges]); // Debugging
       } catch (error) {
         console.error("Error fetching graph data:", error);
       }
     };
 
     fetchGraphData();
-  }, [backendUrl]);
+  }, []);
 
   const initialLayout = {
-    name: "grid",
+    name: "cose",
     animate: true,
     fit: true,
     padding: 30,
@@ -118,7 +123,7 @@ const GraphVisualization = ({ backendUrl }) => {
         color: "#fff",
         "text-valign": "center",
         "text-halign": "center",
-        "font-size": "12px", // Increased font size for better visibility
+        "font-size": "12px",
       },
     },
     {
@@ -161,39 +166,38 @@ const GraphVisualization = ({ backendUrl }) => {
   ];
 
   return (
-    <CytoscapeComponent
-      elements={elements.length > 0 ? elements : []}
-      style={{ width: "100%", height: "600px" }}
-      layout={initialLayout}
-      stylesheet={style}
-      cy={(cy) => {
-        cy.ready(() => {
-          // Fit the graph to the container size initially
+    <div className="graph-visualization-container">
+      <h2>Graph Visualization</h2>
+      {/* Back to Home Button */}
+      <button
+        className="back-button"
+        onClick={() => navigate('/')}
+      >
+        Back to Home
+      </button>
+      <CytoscapeComponent
+        elements={elements.length > 0 ? elements : []}
+        style={{ width: "100%", height: "600px", border: "1px solid #ccc", borderRadius: "8px" }}
+        layout={initialLayout}
+        stylesheet={style}
+        cy={(cy) => {
+          cy.ready(() => {
+            cy.layout(initialLayout).run();
+          });
 
-          // Change layout to circle after 2 seconds without resetting zoom
-          setTimeout(() => {
-            const circleLayout = cy.layout({
-              name: "circle",
-              animate: true,
-              fit: false, // Do not auto-fit during layout change
-              padding: 30,
-            });
-            circleLayout.run();
-          }, 2000);
-        });
+          // Enable zooming and panning
+          cy.zoomingEnabled(true);
+          cy.panningEnabled(true);
+          cy.minZoom(0.5);
+          cy.maxZoom(3);
 
-        // Enable zooming and panning
-        cy.zoomingEnabled(true);
-        cy.panningEnabled(true);
-        cy.minZoom(0.5); // Minimum zoom level
-        cy.maxZoom(3); // Maximum zoom level
-
-        // Optional: Add event listeners or additional configurations
-        cy.on("zoom", (event) => {
-          console.log("Zoom level:", cy.zoom());
-        });
-      }}
-    />
+          // Optional: Add event listeners or additional configurations
+          cy.on("zoom", (event) => {
+            console.log("Zoom level:", cy.zoom());
+          });
+        }}
+      />
+    </div>
   );
 };
 

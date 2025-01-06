@@ -1,9 +1,17 @@
-// src/components/ManagerDashboard.js
+// src/components/manager/ManagerDashboard.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Select from "react-select";
-import { useNavigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import GraphVisualization from "./GraphVisualization";
+import ManagerNavbar from "./ManagerNavbar";
+import AssignTask from "./AssignTask";
+import AddSkill from "./AddSkill";
+import LinkTaskToEpic from "./LinkTaskToEpic";
+import AddTaskDependency from "./AddTaskDependency";
+import AddSoloEntities from "./AddSoloEntities";
+import ManageEmployees from "./ManageEmployees";
+import ManageTasks from "./ManageTasks";
+import { useNavigate } from "react-router-dom";
 
 // Define apiClient outside the component to ensure it's only created once
 const backendUrl = "http://localhost:8080";
@@ -30,20 +38,21 @@ const ManagerDashboard = () => {
   const [taskDependency2, setTaskDependency2] = useState(null);
   const navigate = useNavigate();
   const currentUserEmail = localStorage.getItem("email");
-  const filteredUsers = users.filter(email => email !== currentUserEmail);
+  const filteredUsers = users.filter((email) => email !== currentUserEmail);
 
   useEffect(() => {
-    let isMounted = true; // Track if component is mounted
+    let isMounted = true;
 
     const fetchData = async () => {
       try {
         if (isMounted) {
-          const [userResponse, taskResponse, epicResponse, skillResponse] = await Promise.all([
-            apiClient.get(`/graph/users`),
-            apiClient.get(`/graph/tasks`),
-            apiClient.get(`/graph/epics`),
-            apiClient.get(`/graph/skills`),
-          ]);
+          const [userResponse, taskResponse, epicResponse, skillResponse] =
+            await Promise.all([
+              apiClient.get(`/graph/users`),
+              apiClient.get(`/graph/tasks`),
+              apiClient.get(`/graph/epics`),
+              apiClient.get(`/graph/skills`),
+            ]);
 
           console.log("Users Response:", userResponse.data);
           console.log("Tasks Response:", taskResponse.data);
@@ -59,13 +68,12 @@ const ManagerDashboard = () => {
         console.error("Error fetching data:", error);
         if (error.response && error.response.status === 401) {
           alert("Unauthorized. Please log in again.");
-          navigate('/login');
+          navigate("/login");
         }
       }
     };
 
     fetchData(); // Fetch data initially
-
     const intervalId = setInterval(fetchData, 30000); // Fetch data every 30 seconds
 
     return () => {
@@ -74,7 +82,7 @@ const ManagerDashboard = () => {
     };
   }, [navigate]); // Removed apiClient from dependencies
 
-  // ... (rest of your handlers remain unchanged)
+  // Handler Functions
 
   // Handle Assign Task
   const handleAssignTask = async () => {
@@ -161,7 +169,7 @@ const ManagerDashboard = () => {
       const response = await apiClient.delete(`/manager/employees/${email}`);
       alert(response.data);
       // Refresh user list
-      setUsers(users.filter(user => user.email !== email));
+      setUsers(users.filter((user) => user !== email));
     } catch (error) {
       console.error("Error deleting employee:", error);
       alert("Error deleting employee: " + (error.response?.data || error.message));
@@ -177,7 +185,7 @@ const ManagerDashboard = () => {
       const response = await apiClient.delete(`/manager/tasks/${taskId}`);
       alert(response.data);
       // Refresh task list
-      setTasks(tasks.filter(task => task.id !== taskId));
+      setTasks(tasks.filter((task) => task !== taskId));
     } catch (error) {
       console.error("Error deleting task:", error);
       alert("Error deleting task: " + (error.response?.data || error.message));
@@ -187,15 +195,13 @@ const ManagerDashboard = () => {
   // Similarly, implement handleDeleteSkill, handleDeleteEpic, handleDeleteDependency
 
   // Map data to options for react-select
-  const mapToOptions = (items, key = 'email') =>
+  const mapToOptions = (items, key = "email") =>
     items.map((item) => {
-      if (typeof item === 'string') {
+      if (typeof item === "string") {
         return { value: item, label: item };
       }
       return { value: item[key], label: item.name || item.id || item };
     });
-  
-  
 
   // Handle Add Solo Skill
   const handleAddSoloSkill = async () => {
@@ -273,173 +279,127 @@ const ManagerDashboard = () => {
     }
   };
 
+  // Example: Adding a default landing page
+  const DefaultPage = () => (
+    <div>
+      <h2>Welcome to the Manager Dashboard</h2>
+      <p>Select an action from the navigation bar.</p>
+    </div>
+  );
+
   return (
     <div style={{ padding: "20px" }}>
       <h1>Manager Dashboard</h1>
 
       {/* Logout Button */}
-      <button onClick={() => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('role');
-        navigate('/login');
-      }} style={{ float: 'right' }}>
+      <button
+        onClick={() => {
+          localStorage.removeItem("token");
+          localStorage.removeItem("role");
+          navigate("/login");
+        }}
+        style={{ float: "right" }}
+      >
         Logout
       </button>
 
-      {/* Visualization */}
-      <GraphVisualization backendUrl={backendUrl} />
+      {/* Navbar */}
+      <ManagerNavbar />
 
-      {/* Editable Section */}
-      <section style={{ marginBottom: "30px", marginTop: "50px" }}>
-        <h2>Edit Everything</h2>
-
-        {/* Assign Task */}
-        <div style={{ marginBottom: "20px" }}>
-          <h3>Assign Task to User</h3>
-          <Select
-            options={mapToOptions(users, 'email')}
-            value={selectedUser}
-            onChange={setSelectedUser}
-            placeholder="Select User"
-            isSearchable
-          />
-          <Select
-            options={mapToOptions(tasks, 'id')}
-            value={selectedTask}
-            onChange={setSelectedTask}
-            placeholder="Select Task"
-            isSearchable
-          />
-          <button onClick={handleAssignTask} style={{ marginTop: "10px" }}>Assign Task</button>
-        </div>
-
-        {/* Add Skill */}
-        <div style={{ marginBottom: "20px" }}>
-          <h3>Add Skill to User</h3>
-          <Select
-            options={mapToOptions(users, 'email')}
-            value={selectedUser}
-            onChange={setSelectedUser}
-            placeholder="Select User"
-            isSearchable
-          />
-          <Select
-            options={mapToOptions(skills, 'name')}
-            value={selectedSkill}
-            onChange={setSelectedSkill}
-            placeholder="Select Skill"
-            isSearchable
-          />
-          <button onClick={handleAddSkill} style={{ marginTop: "10px" }}>Add Skill</button>
-        </div>
-
-        {/* Link Task to Epic */}
-        <div style={{ marginBottom: "20px" }}>
-          <h3>Link Task to Epic</h3>
-          <Select
-            options={mapToOptions(tasks, 'id')}
-            value={selectedTask}
-            onChange={setSelectedTask}
-            placeholder="Select Task"
-            isSearchable
-          />
-          <Select
-            options={mapToOptions(epics, 'id')}
-            value={selectedEpic}
-            onChange={setSelectedEpic}
-            placeholder="Select Epic"
-            isSearchable
-          />
-          <button onClick={handleLinkTaskToEpic} style={{ marginTop: "10px" }}>Link Task</button>
-        </div>
-
-        {/* Add Task Dependency */}
-        <div style={{ marginBottom: "20px" }}>
-          <h3>Add Task Dependency</h3>
-          <Select
-            options={mapToOptions(tasks, 'id')}
-            value={taskDependency1}
-            onChange={setTaskDependency1}
-            placeholder="Select Task 1"
-            isSearchable
-          />
-          <Select
-            options={mapToOptions(tasks, 'id')}
-            value={taskDependency2}
-            onChange={setTaskDependency2}
-            placeholder="Select Task 2"
-            isSearchable
-          />
-          <button onClick={handleAddTaskDependency} style={{ marginTop: "10px" }}>Add Dependency</button>
-        </div>
-      </section>
-
-      <section style={{ marginBottom: "30px", marginTop: "50px" }}>
-        <h2>Add Entities</h2>
-
-        {/* Add Solo Skill */}
-        <button onClick={handleAddSoloSkill} style={{ marginBottom: "10px" }}>
-          Add Solo Skill
-        </button>
-
-        {/* Add Solo Task */}
-        <button onClick={handleAddSoloTask} style={{ marginBottom: "10px", marginLeft: "10px" }}>
-          Add Solo Task
-        </button>
-
-        {/* Add Solo Epic */}
-        <button onClick={handleAddSoloEpic} style={{ marginBottom: "10px", marginLeft: "10px" }}>
-          Add Solo Epic
-        </button>
-
-        {/* Add Solo Dependency */}
-        <button onClick={handleAddSoloDependency} style={{ marginBottom: "10px", marginLeft: "10px" }}>
-          Add Solo Dependency
-        </button>
-      </section>
-
-      {/* Manage Employees */}
-      <section style={{ marginBottom: "30px" }}>
-        <h2>Manage Employees</h2>
-        {filteredUsers.length > 0 ? (
-          <ul>
-            {filteredUsers.map((email, index) => (
-              <li key={index} style={{ marginBottom: "10px" }}>
-                {email}
-                <button
-                  onClick={() => handleDeleteEmployee(email)}
-                  style={{ marginLeft: "10px" }}
-                >
-                  Delete
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No employees found.</p>
-        )}
-      </section>
-
-      {/* Manage Tasks */}
-      <section style={{ marginBottom: "30px" }}>
-        <h2>Manage Tasks</h2>
-        {console.log("Tasks:", tasks)} {/* Logs the tasks array */}
-        <ul>
-          {tasks.map((taskId) => (
-            <li key={taskId} style={{ marginBottom: "10px" }}>
-              Task ID: {taskId} {/* Display the task ID directly */}
-              <button
-                onClick={() => handleDeleteTask(taskId)}
-                style={{ marginLeft: "10px" }}
-              >
-                Delete
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Similarly, add sections for managing Skills, Epics, and Dependencies */}
+      {/* Nested Routes */}
+      <Routes>
+        <Route path="/" element={<DefaultPage />} />
+        <Route
+          path="assign-task"
+          element={
+            <AssignTask
+              users={filteredUsers}
+              tasks={tasks}
+              selectedUser={selectedUser}
+              setSelectedUser={setSelectedUser}
+              selectedTask={selectedTask}
+              setSelectedTask={setSelectedTask}
+              handleAssignTask={handleAssignTask}
+              mapToOptions={mapToOptions}
+            />
+          }
+        />
+        <Route
+          path="add-skill"
+          element={
+            <AddSkill
+              users={filteredUsers}
+              skills={skills}
+              selectedUser={selectedUser}
+              setSelectedUser={setSelectedUser}
+              selectedSkill={selectedSkill}
+              setSelectedSkill={setSelectedSkill}
+              handleAddSkill={handleAddSkill}
+              mapToOptions={mapToOptions}
+            />
+          }
+        />
+        <Route
+          path="link-task-epic"
+          element={
+            <LinkTaskToEpic
+              tasks={tasks}
+              epics={epics}
+              selectedTask={selectedTask}
+              setSelectedTask={setSelectedTask}
+              selectedEpic={selectedEpic}
+              setSelectedEpic={setSelectedEpic}
+              handleLinkTaskToEpic={handleLinkTaskToEpic}
+              mapToOptions={mapToOptions}
+            />
+          }
+        />
+        <Route
+          path="add-task-dependency"
+          element={
+            <AddTaskDependency
+              tasks={tasks}
+              taskDependency1={taskDependency1}
+              setTaskDependency1={setTaskDependency1}
+              taskDependency2={taskDependency2}
+              setTaskDependency2={setTaskDependency2}
+              handleAddTaskDependency={handleAddTaskDependency}
+              mapToOptions={mapToOptions}
+            />
+          }
+        />
+        <Route
+          path="add-solo-entities"
+          element={
+            <AddSoloEntities
+              handleAddSoloSkill={handleAddSoloSkill}
+              handleAddSoloTask={handleAddSoloTask}
+              handleAddSoloEpic={handleAddSoloEpic}
+              handleAddSoloDependency={handleAddSoloDependency}
+            />
+          }
+        />
+        <Route
+          path="manage-employees"
+          element={
+            <ManageEmployees
+              filteredUsers={filteredUsers}
+              handleDeleteEmployee={handleDeleteEmployee}
+            />
+          }
+        />
+        <Route
+          path="manage-tasks"
+          element={
+            <ManageTasks tasks={tasks} handleDeleteTask={handleDeleteTask} />
+          }
+        />
+        <Route
+          path="graph-visualization"
+          element={<GraphVisualization />} // No props needed as backendUrl is defined within the component
+        />
+      </Routes>
+      
     </div>
   );
 };

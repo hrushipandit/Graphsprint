@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // For navigation
-import './Login.css'; // Optional styling
+import { useNavigate } from 'react-router-dom';
+import './Login.css'; // For styling
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -41,9 +41,10 @@ const Login = () => {
   };
 
   return (
-    <div>
+    <div className="login-container">
       <h2>Login</h2>
       <form
+        className="login-form"
         onSubmit={(e) => {
           e.preventDefault();
           handleLogin();
@@ -67,6 +68,12 @@ const Login = () => {
           {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
+      <button
+        className="back-button"
+        onClick={() => navigate('/')}
+      >
+        Back to Home
+      </button>
     </div>
   );
 };

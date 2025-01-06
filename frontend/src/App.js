@@ -6,9 +6,9 @@ import Signup from './components/Signup';
 import TaskGraph from './components/TaskGraph';
 import Dashboard from './components/Dashboard';
 import TaskEditor from './components/TaskEditor';
-import ManagerDashboard from './components/ManagerDashboard';
-import EmployeeDashboard from './components/EmployeeDashboard';
-import GraphVisualization from './components/GraphVisualization';
+import EmployeeDashboard from './components/employee/EmployeeDashboard';
+import ManagerDashboard from './components/manager/ManagerDashboard';
+import GraphVisualization from './components/manager/GraphVisualization';
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 
 // Initialize Apollo Client
@@ -28,8 +28,8 @@ function App() {
           <Route path="/tasks" element={<TaskGraph />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/editor" element={<TaskEditor />} />
-          <Route path="/manager-dashboard" element={<ManagerDashboard />} />
-          <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
+          <Route path="/manager-dashboard/*" element={<ManagerDashboard />} />
+          <Route path="/employee-dashboard/*" element={<EmployeeDashboard />} />
           <Route path="/neo4j-graph" element={<GraphVisualization />} />
         </Routes>
       </Router>
