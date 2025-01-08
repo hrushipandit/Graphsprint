@@ -1,0 +1,20 @@
+type Query {
+    users: [User]
+}
+
+type User {
+    email: String
+    name: String
+    role: String
+    tasks: [Task]
+    skills: [Skill]
+}
+
+type Task {
+    id: String
+    name: String
+}
+
+type Skill {
+    name: String
+}

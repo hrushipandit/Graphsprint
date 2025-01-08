@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Routes, Route } from "react-router-dom";
 import GraphVisualization from "./GraphVisualization";
+import UserGraphVisualization from "./UserGraphVisualization";
 import ManagerNavbar from "./ManagerNavbar";
 import AssignTask from "./AssignTask";
 import AddSkill from "./AddSkill";
@@ -11,6 +12,7 @@ import AddTaskDependency from "./AddTaskDependency";
 import AddSoloEntities from "./AddSoloEntities";
 import ManageEmployees from "./ManageEmployees";
 import ManageTasks from "./ManageTasks";
+import SearchUserInfo from "./SearchUserInfo";
 import { useNavigate } from "react-router-dom";
 
 // Define apiClient outside the component to ensure it's only created once
@@ -397,6 +399,10 @@ const ManagerDashboard = () => {
         <Route
           path="graph-visualization"
           element={<GraphVisualization />} // No props needed as backendUrl is defined within the component
+        />
+        <Route
+          path="search-user-info"
+          element={<SearchUserInfo />} // No props needed as backendUrl is defined within the component
         />
       </Routes>
       

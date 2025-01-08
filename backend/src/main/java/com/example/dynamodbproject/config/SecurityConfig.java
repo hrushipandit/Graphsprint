@@ -23,7 +23,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow all OPTIONS requests
                 .requestMatchers("/auth/signup", "/auth/login").permitAll() // Allow signup and login without authentication
-                .requestMatchers("/employee/**").hasRole("employee") // Ensure Employee can access `/employee/**`
+                .requestMatchers("/employee/**").hasRole("employee")
+                .requestMatchers("/graphql").permitAll()// Ensure Employee can access `/employee/**`
                 .anyRequest().authenticated() // Protect all other endpoints
             )
             .addFilterBefore(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class); // Add JWT filter

@@ -8,6 +8,7 @@ import App from './App';
 
 const root = ReactDOM.createRoot(document.getElementById('root')); // Create the root
 root.render(
+  <ApolloProvider client={client}>
   <React.StrictMode>
     <Provider store={store}>
       <ApolloProvider client={client}>
@@ -15,4 +16,5 @@ root.render(
       </ApolloProvider>
     </Provider>
   </React.StrictMode>
+  </ApolloProvider>
 );

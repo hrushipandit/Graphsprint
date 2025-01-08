@@ -236,10 +236,12 @@ public class UserService {
 
         try (Session session = neo4jDriver.session()) {
             Result result = session.run(
-                "MATCH (u:User)-[r]->(m) " +
-                "RETURN labels(u) AS fromLabel, u.email AS fromId, type(r) AS relationship, " +
-                "labels(m) AS toLabel, m.id AS toId"
-            );
+    "MATCH (u:User)-[r]->(m) " +
+    "RETURN labels(u) AS fromLabel, u.email AS fromId, type(r) AS relationship, " +
+    "labels(m) AS toLabel, " +
+    "CASE WHEN m.id IS NOT NULL THEN m.id ELSE m.name END AS toId"
+);
+
 
             while (result.hasNext()) {
                 var record = result.next();
@@ -257,5 +259,48 @@ public class UserService {
 
         return relationships;
     }
+    public List<String> getAssignedTasks(String email) {
+    try (Session session = neo4jDriver.session()) {
+        Result result = session.run(
+            "MATCH (u:User {email: $email})-[:ASSIGNED_TO]->(t:Task) RETURN t.id AS id",
+            Map.of("email", email)
+        );
+
+        return result.list(record -> record.get("id").asString());
+    }
+}
+
+public List<String> getUserSkills(String email) {
+    try (Session session = neo4jDriver.session()) {
+        Result result = session.run(
+            "MATCH (u:User {email: $email})-[:HAS_SKILL]->(s:Skill) RETURN s.name AS name",
+            Map.of("email", email)
+        );
+
+        return result.list(record -> record.get("name").asString());
+    }
+}
+
+public Map<String, String> getUserDetails(String email) {
+    GetItemRequest request = GetItemRequest.builder()
+            .tableName("Users")
+            .key(Map.of(
+                    "PK", AttributeValue.builder().s("USER#" + email).build(),
+                    "SK", AttributeValue.builder().s("METADATA").build()
+            ))
+            .build();
+
+    Map<String, AttributeValue> item = dynamoDbClient.getItem(request).item();
+
+    if (item == null || item.isEmpty()) {
+        throw new RuntimeException("User not found");
+    }
+
+    return Map.of(
+            "Name", item.get("Name").s(),
+            "Role", item.get("Role").s()
+    );
+}
+
 
 }

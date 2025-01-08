@@ -91,7 +91,9 @@ const ManagerNavbar = () => (
         >
           Graph Visualization
         </NavLink>
+        
       </li>
+  
     </ul>
   </nav>
 );

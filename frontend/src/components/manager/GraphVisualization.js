@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import './GraphVisualization.css'; // Import CSS for styling
+import "./GraphVisualization.css"; // Import CSS for styling
 
 const backendUrl = "http://localhost:8080";
 
@@ -20,7 +20,7 @@ const apiClient = axios.create({
 const GraphVisualization = () => {
   const [elements, setElements] = useState([]);
   const navigate = useNavigate();
-
+  
   useEffect(() => {
     const fetchGraphData = async () => {
       try {
@@ -33,7 +33,6 @@ const GraphVisualization = () => {
             apiClient.get(`/graph/relationships`),
           ]);
 
-        // Validate and filter data
         const users = Array.isArray(usersRes.data) ? usersRes.data.filter(email => email && email !== 'null') : [];
         const tasks = Array.isArray(tasksRes.data) ? tasksRes.data.filter(id => id && id !== 'null') : [];
         const epics = Array.isArray(epicsRes.data) ? epicsRes.data.filter(id => id && id !== 'null') : [];
@@ -52,7 +51,6 @@ const GraphVisualization = () => {
             rel.relationship !== 'null'
         ) : [];
 
-        // Create nodes
         const nodes = [
           ...users.map((email) => ({
             data: { id: `User_${email}`, label: email, type: "User" },
@@ -68,25 +66,13 @@ const GraphVisualization = () => {
           })),
         ];
 
-        // Create a Set of valid node IDs for quick lookup
         const validNodeIds = new Set(nodes.map(node => node.data.id));
 
-        // Create edges, ensuring both source and target exist
         const edges = relationships
           .filter(rel => {
             const sourceId = `${rel.fromLabel}_${rel.fromId}`;
             const targetId = `${rel.toLabel}_${rel.toId}`;
-            const sourceExists = validNodeIds.has(sourceId);
-            const targetExists = validNodeIds.has(targetId);
-
-            if (!sourceExists) {
-              console.warn(`Source node ${sourceId} does not exist.`);
-            }
-            if (!targetExists) {
-              console.warn(`Target node ${targetId} does not exist.`);
-            }
-
-            return sourceExists && targetExists;
+            return validNodeIds.has(sourceId) && validNodeIds.has(targetId);
           })
           .map((rel) => ({
             data: {
@@ -98,7 +84,6 @@ const GraphVisualization = () => {
           }));
 
         setElements([...nodes, ...edges]);
-        console.log("Graph Elements:", [...nodes, ...edges]); // Debugging
       } catch (error) {
         console.error("Error fetching graph data:", error);
       }
@@ -108,7 +93,7 @@ const GraphVisualization = () => {
   }, []);
 
   const initialLayout = {
-    name: "cose",
+    name: "cose", // Changed to 'cose' for better layout
     animate: true,
     fit: true,
     padding: 30,
