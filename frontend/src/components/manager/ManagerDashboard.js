@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Routes, Route } from "react-router-dom";
 import GraphVisualization from "./GraphVisualization";
-import UserGraphVisualization from "./UserGraphVisualization";
+import Chatbox from "./ChatBox";
 import ManagerNavbar from "./ManagerNavbar";
 import AssignTask from "./AssignTask";
 import AddSkill from "./AddSkill";
@@ -403,6 +403,10 @@ const ManagerDashboard = () => {
         <Route
           path="search-user-info"
           element={<SearchUserInfo />} // No props needed as backendUrl is defined within the component
+        />
+        <Route
+          path="chatbox"
+          element={<Chatbox />} // No props needed as backendUrl is defined within the component
         />
       </Routes>
       

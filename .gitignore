@@ -7,3 +7,4 @@ node_modules/
 # Ignore build and cache files
 .cache/
 dist/
+.env

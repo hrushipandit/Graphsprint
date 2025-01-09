@@ -94,6 +94,18 @@ const ManagerNavbar = () => (
         
       </li>
   
+      <li style={styles.li}>
+        <NavLink
+          to="/manager-dashboard/chatbox" // New link for GraphVisualization
+          style={({ isActive }) => ({
+            ...styles.link,
+            backgroundColor: isActive ? "#555" : "transparent",
+          })}
+        >
+          Chatbox
+        </NavLink>
+        
+      </li>
     </ul>
   </nav>
 );
