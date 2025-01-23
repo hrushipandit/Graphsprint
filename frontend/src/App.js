@@ -10,6 +10,7 @@ import EmployeeDashboard from './components/employee/EmployeeDashboard';
 import ManagerDashboard from './components/manager/ManagerDashboard';
 import GraphVisualization from './components/manager/GraphVisualization';
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Initialize Apollo Client
 const client = new ApolloClient({

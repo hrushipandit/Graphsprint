@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI, HTTPException
 from langchain.graphs import Neo4jGraph
 from langchain.vectorstores.neo4j_vector import Neo4jVector
@@ -129,24 +128,35 @@ cypher_chain = GraphCypherQAChain.from_llm(
 
 # Create a PromptTemplate with the context
 context = """
-The database is a Neo4j graph database that models an agile software development environment. It contains the following types of nodes and relationships:
-1. **User**: Represent team members with properties name, email, role.
-2. **Task**: Represent work items with properties id and name.
-3. **Skill**: Represent expertise areas with properties name.
-4. **Epic**: Represent high-level goals with properties id.
+You are an AI assistant responsible for querying and modifying a Neo4j graph database.
+Always generate and execute Cypher queries to retrieve factual data. You are free to edit and delete everything other than User field.
+Do not guess or fabricate responses. If the operation is about editing, just return a response saying 'Task done'.
 
-Relationships between nodes:
-- **ASSIGNED_TO**: Links a User to the Task they are assigned.
-- **HAS_SKILL**: Links a User to the Skills they possess.
-- **PART_OF**: Links a Task to an Epic it contributes to.
-- **DEPENDS_ON**: Links one Task to another Task it depends on.
+Schema Overview:
+1. **User**: Properties - name, email, role.
+2. **Task**: Properties - id, name.
+3. **Skill**: Properties - name.
+4. **Epic**: Properties - id.
 
-You are an agent that can:
-1. Retrieve information using unstructured embeddings for natural language queries.
-2. Execute structured Cypher queries on the graph for specific relationships or properties.
+Relationships:
+- `ASSIGNED_TO`: Links User to Task.
+- `HAS_SKILL`: Links User to Skill.
+- `PART_OF`: Links Task to Epic.
+- `DEPENDS_ON`: Links one Task to another.
+
+**Instructions for Agent:**
+1. Always generate precise Cypher queries for each question.
+2. Correct any typos in the user's query (e.g., "Tasks" → "Task").
+3. If uncertain about the query, ask for clarification instead of assuming.
+
+**Example Queries:**
+- "What skills does Hrushikesh have?" → Cypher: `MATCH (u:User {name: 'Hrushikesh'})-[:HAS_SKILL]->(s:Skill) RETURN s.name`
+- "Which users are assigned to Task 101?" → Cypher: `MATCH (u:User)-[:ASSIGNED_TO]->(t:Task {id: '101'}) RETURN u.name`
+-  Delete the Epic name 'Idk' → Cypher: 'MATCH (e:Epic {id: 'Idk'}) DETACH DELETE e'
+Your response must contain only the retrieved data in natural language or a confirmation that the editing is done with 'Task done'.
 """
 
-prompt = PromptTemplate(template=context, input_variables=[])
+prompt = PromptTemplate(template=context, input_variables=["query"])
 
 # Wrap it into a SystemMessagePromptTemplate
 system_prompt = SystemMessagePromptTemplate(prompt=prompt)
@@ -162,39 +172,40 @@ tools = [
     Tool(
         name="Users",
         func=user_qa.run,
-        description="Use this tool for questions about users, such as their details or assignments. This tool generates and executes Cypher queries in the Neo4j database."
+        description="Use this tool for questions about User, such as their details or assignments. This tool generates and executes Cypher queries in the Neo4j database."
     ),
     Tool(
         name="Skills",
         func=skill_qa.run,
-        description="Use this tool to find users who have specific skills such as 'C++'. This tool generates and executes Cypher queries in the Neo4j database."
+        description="Use this tool to find User who have specific Skill such as 'C++'. This tool generates and executes Cypher queries in the Neo4j database."
     ),
     Tool(
         name="Epics",
         func=epic_qa.run,
-        description="Use this tool for questions about epics, such as their associated tasks. This tool generates and executes Cypher queries in the Neo4j database."
+        description="Use this tool for questions about Epic, such as their associated tasks. This tool generates and executes Cypher queries in the Neo4j database."
     ),
     Tool(
         name="Graph",
         func=cypher_chain.run,
-        description="Use this tool for structured Cypher queries about users, skills, tasks, and their relationships.This tool generates and executes Cypher queries in the Neo4j database."
+        description="Use this tool for structured Cypher queries about User, Skill, Task, and their relationships.This tool generates and executes Cypher queries in the Neo4j database."
     ),
 ]
 
 agent = initialize_agent(
     tools,
-    ChatOpenAI(temperature=0, model_name='gpt-4'),
+    ChatOpenAI(temperature=0, model_name='gpt-4', max_tokens=500),
     agent=AgentType.OPENAI_FUNCTIONS,
     verbose=True
 )
 
-user_query = "Which Skill does the User Hrushikesh have?"
-full_query = system_prompt.format() + "\n\n" + user_query
+full_query = "Please execute a structured query on the above question using the Graph tool and return output in natural language: Here is further context: " + context + "\n\n"
 
 @app.get("/query")
 async def query_agent(query: str):
     try:
-        response = agent.run(full_query)
+        query = f"The question is:\n\n{query}{full_query}"
+        print(query)
+        response = agent.invoke(query)
         return {"response": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

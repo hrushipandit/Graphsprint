@@ -39,17 +39,10 @@ public class UserService {
     ScanResponse scanResponse = dynamoDbClient.scan(scanRequest);
     uniqueUsers.addAll(
             scanResponse.items().stream()
-                    .map(item -> item.get("PK").s().replace("USER#", ""))
-                    .collect(Collectors.toSet()) // Ensure unique entries
+                    .map(item -> item.get("Name").s().replace("USER#", ""))
+                    .collect(Collectors.toSet()) 
     );
 
-    // Fetch from Neo4j
-    try (Session session = neo4jDriver.session()) {
-        Result result = session.run("MATCH (u:User) RETURN u.email AS email");
-        uniqueUsers.addAll(
-                result.stream().map(record -> record.get("email").asString()).collect(Collectors.toSet())
-        );
-    }
 
     // Convert Set back to List and return
     return new ArrayList<>(uniqueUsers);
@@ -237,10 +230,13 @@ public class UserService {
         try (Session session = neo4jDriver.session()) {
             Result result = session.run(
     "MATCH (u:User)-[r]->(m) " +
-    "RETURN labels(u) AS fromLabel, u.email AS fromId, type(r) AS relationship, " +
+    "RETURN labels(u) AS fromLabel, " +
+    "COALESCE(u.name, u.email) AS fromId, " +
+    "type(r) AS relationship, " +
     "labels(m) AS toLabel, " +
-    "CASE WHEN m.id IS NOT NULL THEN m.id ELSE m.name END AS toId"
+    "COALESCE(m.name, m.id) AS toId"
 );
+
 
 
             while (result.hasNext()) {
@@ -259,16 +255,17 @@ public class UserService {
 
         return relationships;
     }
-    public List<String> getAssignedTasks(String email) {
+    public List<String> getAssignedTasks(String userId) {
     try (Session session = neo4jDriver.session()) {
         Result result = session.run(
-            "MATCH (u:User {email: $email})-[:ASSIGNED_TO]->(t:Task) RETURN t.id AS id",
-            Map.of("email", email)
+            "MATCH (u:User {id: $userId})-[:ASSIGNED_TO]->(t:Task) RETURN t.id AS id",
+            Map.of("userId", userId)
         );
 
         return result.list(record -> record.get("id").asString());
     }
 }
+
 
 public List<String> getUserSkills(String email) {
     try (Session session = neo4jDriver.session()) {

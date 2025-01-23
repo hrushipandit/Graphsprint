@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Login.css'; // For styling
+import './Login.css'; 
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -21,9 +21,10 @@ const Login = () => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log("Login Response Data:", data);
         localStorage.setItem('token', data.token); // Save JWT
         localStorage.setItem('role', data.role); // Save role
-
+        localStorage.setItem('name', data.name); // Save name
         if (data.role === 'Manager') {
           navigate('/manager-dashboard');
         } else {

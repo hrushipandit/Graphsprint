@@ -39,17 +39,13 @@ const GraphVisualization = () => {
         const skills = Array.isArray(skillsRes.data) ? skillsRes.data.filter(name => name && name !== 'null') : [];
         const relationships = Array.isArray(relationshipsRes.data) ? relationshipsRes.data.filter(
           rel =>
-            rel.fromId &&
-            rel.toId &&
-            rel.fromLabel &&
-            rel.toLabel &&
-            rel.relationship &&
-            rel.fromId !== 'null' &&
-            rel.toId !== 'null' &&
-            rel.fromLabel !== 'null' &&
-            rel.toLabel !== 'null' &&
-            rel.relationship !== 'null'
+            rel.fromId?.trim() && 
+            rel.toId?.trim() &&
+            rel.fromLabel?.trim() &&
+            rel.toLabel?.trim() &&
+            rel.relationship?.trim()
         ) : [];
+        
 
         const nodes = [
           ...users.map((email) => ({
@@ -68,20 +64,20 @@ const GraphVisualization = () => {
 
         const validNodeIds = new Set(nodes.map(node => node.data.id));
 
-        const edges = relationships
-          .filter(rel => {
-            const sourceId = `${rel.fromLabel}_${rel.fromId}`;
-            const targetId = `${rel.toLabel}_${rel.toId}`;
-            return validNodeIds.has(sourceId) && validNodeIds.has(targetId);
-          })
-          .map((rel) => ({
-            data: {
-              id: `${rel.relationship}_${rel.fromId}_${rel.toId}`,
-              source: `${rel.fromLabel}_${rel.fromId}`,
-              target: `${rel.toLabel}_${rel.toId}`,
-              label: rel.relationship,
-            },
-          }));
+const edges = relationships
+  .filter(rel => {
+    const sourceId = `${rel.fromLabel}_${rel.fromId}`;
+    const targetId = `${rel.toLabel}_${rel.toId}`;
+    return validNodeIds.has(sourceId) && validNodeIds.has(targetId);
+  })
+  .map((rel) => ({
+    data: {
+      id: `${rel.relationship}_${rel.fromId}_${rel.toId}`,
+      source: `${rel.fromLabel}_${rel.fromId}`,
+      target: `${rel.toLabel}_${rel.toId}`,
+      label: rel.relationship,
+    },
+  }));
 
         setElements([...nodes, ...edges]);
       } catch (error) {
@@ -109,30 +105,8 @@ const GraphVisualization = () => {
         "text-valign": "center",
         "text-halign": "center",
         "font-size": "12px",
-      },
-    },
-    {
-      selector: 'node[type="User"]',
-      style: {
-        "background-color": "#2ECC40",
-      },
-    },
-    {
-      selector: 'node[type="Task"]',
-      style: {
-        "background-color": "#FF4136",
-      },
-    },
-    {
-      selector: 'node[type="Epic"]',
-      style: {
-        "background-color": "#FF851B",
-      },
-    },
-    {
-      selector: 'node[type="Skill"]',
-      style: {
-        "background-color": "#B10DC9",
+        "text-outline-width": 2,
+        "text-outline-color": "#000"
       },
     },
     {
@@ -144,11 +118,13 @@ const GraphVisualization = () => {
         "target-arrow-shape": "triangle",
         "curve-style": "bezier",
         label: "data(label)",
-        "font-size": "8px",
-        "text-rotation": "autorotate",
+        "font-size": "10px",
+        "text-background-color": "#fff",
+        "text-background-opacity": 1,
       },
     },
   ];
+  
 
   return (
     <div className="graph-visualization-container">

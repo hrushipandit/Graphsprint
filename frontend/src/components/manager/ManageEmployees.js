@@ -1,16 +1,33 @@
-// src/components/manager/ManageEmployees.js
 import React from "react";
 
-const ManageEmployees = ({
-  filteredUsers,
-  handleDeleteEmployee,
-}) => {
+const ManageEmployees = ({ filteredUsers, handleDeleteEmployee }) => {
+  // Retrieve the current user's name from localStorage
+  const currentUserName = localStorage.getItem("name");
+
+  // Filter out the current user
+  const employeesToDisplay = filteredUsers.filter(
+    (email) => email !== currentUserName
+  );
+
+  // Log current user and filtered employees
+  console.log("Current User Name:", currentUserName);
+  console.log("Filtered Employees:", employeesToDisplay);
+
   return (
     <div style={{ marginBottom: "30px" }}>
       <h2>Manage Employees</h2>
-      {filteredUsers.length > 0 ? (
+      <p>
+        <strong>Current User:</strong> {currentUserName}
+      </p>
+      <p>
+        <strong>Filtered Employees:</strong>{" "}
+        {employeesToDisplay.length > 0
+          ? employeesToDisplay.join(", ")
+          : "No employees available."}
+      </p>
+      {employeesToDisplay.length > 0 ? (
         <ul>
-          {filteredUsers.map((email, index) => (
+          {employeesToDisplay.map((email, index) => (
             <li key={index} style={{ marginBottom: "10px" }}>
               {email}
               <button

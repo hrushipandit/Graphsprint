@@ -1,5 +1,6 @@
 // src/components/manager/ManagerDashboard.js
 import React, { useState, useEffect } from "react";
+import './ManagerDashboard.css';
 import axios from "axios";
 import { Routes, Route } from "react-router-dom";
 import GraphVisualization from "./GraphVisualization";
@@ -11,7 +12,7 @@ import LinkTaskToEpic from "./LinkTaskToEpic";
 import AddTaskDependency from "./AddTaskDependency";
 import AddSoloEntities from "./AddSoloEntities";
 import ManageEmployees from "./ManageEmployees";
-import ManageTasks from "./ManageTasks";
+import ManageEntities from "./ManageEntities";
 import SearchUserInfo from "./SearchUserInfo";
 import { useNavigate } from "react-router-dom";
 
@@ -281,29 +282,18 @@ const ManagerDashboard = () => {
     }
   };
 
-  // Example: Adding a default landing page
   const DefaultPage = () => (
     <div>
-      <h2>Welcome to the Manager Dashboard</h2>
+      <h2 className="Heading">Welcome to the Manager Dashboard</h2>
       <p>Select an action from the navigation bar.</p>
     </div>
   );
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Manager Dashboard</h1>
+    <div className="manager-dashboard-container">
+      
 
-      {/* Logout Button */}
-      <button
-        onClick={() => {
-          localStorage.removeItem("token");
-          localStorage.removeItem("role");
-          navigate("/login");
-        }}
-        style={{ float: "right" }}
-      >
-        Logout
-      </button>
+
 
       {/* Navbar */}
       <ManagerNavbar />
@@ -391,9 +381,20 @@ const ManagerDashboard = () => {
           }
         />
         <Route
-          path="manage-tasks"
+          path="manage-entities"
           element={
-            <ManageTasks tasks={tasks} handleDeleteTask={handleDeleteTask} />
+            <ManageEntities
+              tasks={tasks}
+              skills={skills}
+              epics={epics}
+              handleDeleteTask={handleDeleteTask}
+              taskDependency1={taskDependency1}
+              taskDependency2={taskDependency2}
+              setTaskDependency1={setTaskDependency1}
+              setTaskDependency2={setTaskDependency2}
+              filteredUsers={filteredUsers}
+              mapToOptions={mapToOptions}
+            />
           }
         />
         <Route

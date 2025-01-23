@@ -1,0 +1,66 @@
+
+/* ManageEmployees.css */
+.manage-employees-container {
+  margin-bottom: 30px;
+  background-color: #209fd2; /* Background color */
+  padding: 20px; /* Padding for spacing */
+  border-radius: 8px; /* Rounded corners */
+  color: #fff; /* Text color for contrast */
+}
+
+.manager-dashboard-container {
+  position: relative; /* Ensures children with absolute positioning are relative to this container */
+  padding-top: 100px; /* Adjust based on your navbar's height */
+  padding-left: 60px;
+  padding-right: 60px;
+  background-color: #f5f5f5; /* Optional background color */
+  min-height: 100vh; /* Ensure the container fills the viewport */
+}
+
+.manage-employees-container h2 {
+  margin-bottom: 20px; /* Add spacing below the heading */
+}
+
+.manage-employees-container ul {
+  list-style-type: none; /* Remove default list styling */
+  padding: 0;
+}
+
+.manage-employees-container li {
+  margin-bottom: 10px;
+}
+
+.manage-employees-container button {
+  margin-left: 10px;
+  background-color: #fff; /* Button background */
+  color: #209fd2; /* Button text color */
+  border: none; /* Remove default border */
+  border-radius: 5px; /* Rounded corners */
+  padding: 5px 10px; /* Button padding */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+.manage-employees-container button:hover {
+  background-color: #f2f2f2; /* Slightly darker hover background */
+}
+
+.logout {
+  position: absolute; /* Allows precise positioning */
+  top: 20px; /* Distance from the top */
+  right: 20px; /* Distance from the right */
+  padding: 10px 15px; /* Padding for button size */
+  font-size: 1rem; /* Text size */
+  background-color: #209fd2; /* Button background color */
+  color: white; /* Text color */
+  border: none; /* Removes default border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adds subtle shadow */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+}
+
+.logout:hover {
+  background-color: #0056a3; /* Slightly darker hover background */
+  transform: scale(1.05); /* Scale effect on hover */
+}

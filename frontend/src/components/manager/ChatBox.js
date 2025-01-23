@@ -17,7 +17,13 @@ const ChatBox = () => {
       const res = await axios.get("http://localhost:8000/query", {
         params: { query },
       });
-      setResponse(res.data.response); // Update response
+
+      // Extract response output correctly from the API response
+      if (res.data && res.data.response && res.data.response.output) {
+        setResponse(res.data.response.output);
+      } else {
+        setError("Unexpected response format from server.");
+      }
     } catch (err) {
       setError("Failed to fetch response. Please try again.");
       console.error(err);

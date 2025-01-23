@@ -23,7 +23,7 @@ const EmployeeDashboard = () => {
 
   useEffect(() => {
     let isMounted = true;
-
+  
     const fetchTasks = async () => {
       try {
         const response = await apiClient.get(`/employee/tasks`);
@@ -38,15 +38,25 @@ const EmployeeDashboard = () => {
         }
       }
     };
-
-    fetchTasks();
-    const intervalId = setInterval(fetchTasks, 30000); // Refresh tasks every 30 seconds
-
+  
+    // Delay the initial fetch with a timer
+    const timeoutId = setTimeout(() => {
+      fetchTasks(); // Fetch tasks after delay
+      const intervalId = setInterval(fetchTasks, 30000); // Refresh tasks every 30 seconds
+  
+      // Cleanup function to clear interval and timeout
+      return () => {
+        clearInterval(intervalId);
+        isMounted = false;
+      };
+    }, 5000); // Delay of 5 seconds before the first API call
+  
     return () => {
-      clearInterval(intervalId);
+      clearTimeout(timeoutId);
       isMounted = false;
     };
   }, [apiClient, navigate]);
+  
 
   // Handler to update task status
   const handleUpdateTaskStatus = async (taskId, newStatus) => {

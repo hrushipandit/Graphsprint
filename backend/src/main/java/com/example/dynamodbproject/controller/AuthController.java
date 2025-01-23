@@ -45,11 +45,12 @@ public class AuthController {
 
             // Fetch user role
             String role = userService.getUser(email).get("Role").s();
-
+            String name = userService.getUser(email).get("Name").s();
             // Prepare response
             Map<String, String> response = new HashMap<>();
             response.put("token", token);
             response.put("role", role);
+            response.put("name", name);
 
             // Return token and role in response
             return ResponseEntity.ok(response);
