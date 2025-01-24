@@ -19,23 +19,24 @@ public class EmployeeController {
     }
 
     @GetMapping("/tasks")
-    public ResponseEntity<List<Map<String, Object>>> getEmployeeTasks() {
-        try {
-            List<Map<String, Object>> tasks = employeeService.getTasksForCurrentEmployee();
-            return ResponseEntity.ok(tasks);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);
-        }
+public ResponseEntity<List<Map<String, Object>>> getEmployeeTasks(@RequestParam String name) {
+    try {
+        List<Map<String, Object>> tasks = employeeService.getTasksForCurrentEmployee(name);
+        return ResponseEntity.ok(tasks);
+    } catch (Exception e) {
+        return ResponseEntity.status(500).body(null);
     }
+}
 
-    @PutMapping("/tasks/{taskId}/status")
-    public ResponseEntity<String> updateTaskStatus(
-            @PathVariable String taskId,
-            @RequestBody Map<String, String> request) {
+@PutMapping("/tasks/{taskId}/status")
+    public ResponseEntity<String> updateTaskStatus(@PathVariable String taskId, @RequestBody Map<String, String> request) {
         try {
-            String status = request.get("status");
-            employeeService.updateTaskStatus(taskId, status);
-            return ResponseEntity.ok("Task status updated successfully!");
+            String newStatus = request.get("status");
+            if (newStatus == null || newStatus.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Status is required.");
+            }
+            employeeService.updateTaskStatus(taskId, newStatus);
+            return ResponseEntity.ok("Task status updated successfully.");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error updating task status: " + e.getMessage());
         }

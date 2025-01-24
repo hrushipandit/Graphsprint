@@ -20,13 +20,14 @@ const EmployeeDashboard = () => {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
   });
-
+  console.log("Auth Token:", localStorage.getItem("token"));
+  console.log("Auth Token:", localStorage.getItem("role"));
   useEffect(() => {
     let isMounted = true;
-  
+    const name = localStorage.getItem("name");
     const fetchTasks = async () => {
       try {
-        const response = await apiClient.get(`/employee/tasks`);
+        const response = await apiClient.get(`/employee/tasks?name=${encodeURIComponent(name)}`);
         if (isMounted) {
           setTasks(response.data);
         }
@@ -49,7 +50,7 @@ const EmployeeDashboard = () => {
         clearInterval(intervalId);
         isMounted = false;
       };
-    }, 5000); // Delay of 5 seconds before the first API call
+    }, 10000); // Delay of 5 seconds before the first API call
   
     return () => {
       clearTimeout(timeoutId);

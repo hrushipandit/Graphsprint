@@ -25,7 +25,10 @@
   padding: 10px;
   font-size: 16px;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 7px;
+  width: 100%;  
+  max-width: 600px; /* Increase the maximum width */
+  box-sizing: border-box;
 }
 
 .login-form button {
@@ -45,8 +48,8 @@
 
 .login-container .back-button {
   position: absolute; 
-  top: 5%; 
-  right: 90%;
+  top: 1%; 
+  right: 92%;
   margin-top: 20px;
   padding: 10px;
   font-size: 16px;

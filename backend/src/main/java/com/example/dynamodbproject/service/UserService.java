@@ -90,15 +90,15 @@ public class UserService {
         return skills;
     }
 
-    public void assignTask(String email, String taskId) {
-    System.out.println("Inside assignTask with email: " + email + ", taskId: " + taskId);
+    public void assignTask(String name, String taskId) {
+    System.out.println("Inside assignTask with name: " + name + ", taskId: " + taskId);
     try (Session session = neo4jDriver.session()) {
         session.writeTransaction(tx -> {
             System.out.println("Executing Cypher Query");
-            tx.run("MERGE (u:User {email: $email}) " +
+            tx.run("MERGE (u:User {name: $name}) " +  // Use name instead of email
                    "MERGE (t:Task {id: $taskId}) " +
                    "MERGE (u)-[:ASSIGNED_TO]->(t)", 
-                   Map.of("email", email, "taskId", taskId));
+                   Map.of("name", name, "taskId", taskId));
             return null;
         });
     } catch (Exception e) {
@@ -109,19 +109,21 @@ public class UserService {
 
 
 
-    public void addSkill(String email, String skillName) {
+
+    public void addSkill(String name, String skillName) {
     try (Session session = neo4jDriver.session()) {
         session.writeTransaction(tx -> {
-            tx.run("MERGE (u:User {email: $email}) " +
+            tx.run("MERGE (u:User {name: $name}) " +  // Use name instead of email
                    "MERGE (s:Skill {name: $skillName}) " +
                    "MERGE (u)-[:HAS_SKILL]->(s)",
-                   Map.of("email", email, "skillName", skillName));
+                   Map.of("name", name, "skillName", skillName));
             return null;
         });
     } catch (Exception e) {
         throw new RuntimeException("Failed to add skill", e);
     }
 }
+
 
 
     public void linkTaskToEpic(String taskId, String epicId) {

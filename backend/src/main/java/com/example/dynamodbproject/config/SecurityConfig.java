@@ -1,6 +1,5 @@
 package com.example.dynamodbproject.config;
 import org.springframework.http.HttpMethod;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -23,7 +22,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow all OPTIONS requests
                 .requestMatchers("/auth/signup", "/auth/login").permitAll() // Allow signup and login without authentication
-                .requestMatchers("/employee/**").hasRole("employee")
+                .requestMatchers("/employee/**").permitAll()
                 .requestMatchers("/graphql").permitAll()// Ensure Employee can access `/employee/**`
                 .anyRequest().authenticated() // Protect all other endpoints
             )

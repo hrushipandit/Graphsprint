@@ -10,7 +10,7 @@
 
 .manager-dashboard-container {
   position: relative; /* Ensures children with absolute positioning are relative to this container */
-  padding-top: 100px; /* Adjust based on your navbar's height */
+  padding-top: 120px; /* Adjust based on your navbar's height */
   padding-left: 60px;
   padding-right: 60px;
   background-color: #f5f5f5; /* Optional background color */
@@ -31,7 +31,7 @@
 }
 
 .manage-employees-container button {
-  margin-left: 10px;
+  margin-left: 80px;
   background-color: #fff; /* Button background */
   color: #209fd2; /* Button text color */
   border: none; /* Remove default border */

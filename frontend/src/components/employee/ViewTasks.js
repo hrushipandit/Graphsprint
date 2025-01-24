@@ -9,7 +9,7 @@ const ViewTasks = ({ tasks }) => {
         <ul>
           {tasks.map((task) => (
             <li key={task.id}>
-              <strong>{task.name}</strong> (ID: {task.id}) - Status: {task.status}
+              <strong>{task.name}</strong>
             </li>
           ))}
         </ul>
