@@ -17,7 +17,6 @@
 | **Microservices** | FASTAPI-based RAG service |
 | **Database**    | Neo4j for relationship management |
 | **Authentication** | JWT-based Role-Based Access Control (RBAC) with DynamoDB |
-| **Deployment**  | AWS Lambda (RAG Microservice), Amazon ECS (Spring Boot Service) |
 
 ## 🚀 Next Steps
 1. **UI Enhancements**: Improve the frontend with a more polished Bootstrap-based interface.
